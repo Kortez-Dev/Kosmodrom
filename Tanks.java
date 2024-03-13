@@ -1,79 +1,60 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 
-public class Tanks extends JFrame implements KeyListener {
-    private String imagePath = "C:\\Schule\\ber.jpg"; // Pfad zum Bild
-    private ImageIcon imageIcon;
-    private int imageY = 0; // Startposition der Bilder in Y-Richtung
-    private int startX; // Startposition der Bilder in X-Richtung
-    private int frameWidth = 2000; // Breite des Fensters
-    private int frameHeight = 1000; // Höhe des Fensters
-    private boolean moving = false; // Zustand der Bewegung
+public class Tanks extends JFrame {
+    private JLabel[] bildLabels = new JLabel[3];
+    private int sichtbareBilder = 3;
 
     public Tanks() {
-        this.setTitle("Bild Bewegung Beispiel");
-        this.setSize(frameWidth, frameHeight);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.addKeyListener(this);
+        this.setTitle("Tanks");
+        this.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 50));
 
-        // Bild laden
-        imageIcon = new ImageIcon(imagePath);
+        this.setSize(800, 600); // Beispielgröße; kann nach Bedarf angepasst werden
+        this.setLocationRelativeTo(null);
 
-        // Berechne die Start-X-Position, um die Bilder zentral zu positionieren
-        int totalWidth = 3 * imageIcon.getIconWidth() + 2 * 10; // Gesamtbreite aller Bilder plus Abstand
-        startX = (frameWidth - totalWidth) / 2; // Zentriere horizontal
-
-        // JPanel, das die Bilder zeichnet
-        JPanel panel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                // Zeichne das erste Bild an der berechneten X- und Y-Position
-                g.drawImage(imageIcon.getImage(), startX, imageY, this);
-                // Zeichne die Kopie des Bildes mit 10 Pixel Abstand vom ersten
-                g.drawImage(imageIcon.getImage(), startX + imageIcon.getIconWidth() + 10, imageY, this);
-                // Zeichne das dritte Bild mit 10 Pixel Abstand von der zweiten Kopie
-                g.drawImage(imageIcon.getImage(), startX + 2 * (imageIcon.getIconWidth() + 10), imageY, this);
-            }
-        };
-
-        this.add(panel);
+        // Layout und Größenanpassungen erfolgen, bevor Bilder geladen werden
         this.setVisible(true);
+
+        Dimension frameGroesse = this.getSize();
+        int zielBreite = (int) (frameGroesse.width * 0.1);
+        int zielHoehe = (int) (frameGroesse.height * 0.2);
+
+        for (int i = 0; i < bildLabels.length; i++) {
+            ImageIcon originalBildIcon = new ImageIcon("C:\\Schule\\Klasse-12\\Informatik\\Informatik Projekt\\Programmierung\\Informatik-Projekt\\src\\tank.png"); // Angepasster Pfad zum Bild
+            ImageIcon skaliertesBildIcon = skaliereBildIcon(originalBildIcon, zielBreite, zielHoehe);
+            bildLabels[i] = new JLabel(skaliertesBildIcon);
+            this.add(bildLabels[i]);
+        }
+
+        // KeyListener, um auf Leertastendruck zu reagieren
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                    naechstesBildVerbergen();
+                }
+            }
+        });
     }
 
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_SPACE && !moving) {
-            moving = true; // Starte die Bewegung, wenn die Leertaste gedrückt wird und nicht bereits in Bewegung
-            moveImages();
+    private void naechstesBildVerbergen() {
+        if (sichtbareBilder > 0) {
+            bildLabels[3 - sichtbareBilder].setVisible(false);
+            sichtbareBilder--;
         }
     }
 
-    private void moveImages() {
-        new Timer(10, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (moving) {
-                    imageY += 10;
-                    if (imageY > frameHeight - imageIcon.getIconHeight()) {
-                        imageY = 0; // Setze die Bilder zurück auf die ursprüngliche Position
-                        moving = false; // Stoppe die Bewegung
-                        ((Timer)e.getSource()).stop(); // Stoppe den Timer
-                    }
-                    repaint(); // Panel neu zeichnen, um die Bilder an der neuen Position zu zeigen
-                }
-            }
-        }).start();
+    private ImageIcon skaliereBildIcon(ImageIcon originalIcon, int zielBreite, int zielHoehe) {
+        Image originalBild = originalIcon.getImage();
+        Image skaliertesBild = originalBild.getScaledInstance(zielBreite, zielHoehe, Image.SCALE_SMOOTH);
+        return new ImageIcon(skaliertesBild);
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) {}
-
-    @Override
-    public void keyReleased(KeyEvent e) {}
-
     public static void main(String[] args) {
-        new Tanks();
+        SwingUtilities.invokeLater(Tanks::new);
     }
 }
