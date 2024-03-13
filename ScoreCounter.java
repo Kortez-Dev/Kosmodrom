@@ -4,11 +4,12 @@ import java.awt.event.ActionListener;
 import java.awt.FlowLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.Color;
 
 public class ScoreCounter extends JFrame {
     private int score = 0; // Startwert des Scores
     private JLabel scoreLabel;
-    private Treibstoffleiste treibstoffleiste;
+    private Treibstoff treibstoff;
 
 
     public ScoreCounter() {
@@ -19,8 +20,8 @@ public class ScoreCounter extends JFrame {
         setLayout(new FlowLayout() );
 
         // Treibstoffleiste hinzufügen
-        treibstoffleiste = new Treibstoffleiste();
-        add(treibstoffleiste);
+        treibstoff = new Treibstoff();
+        add(treibstoff);
 
 
         // Label für die Score-Anzeige
@@ -33,7 +34,7 @@ public class ScoreCounter extends JFrame {
         Timer timer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                score += 10; // Score um 10 erhöhen
+                score += 20; // Score um 10 erhöhen
                 scoreLabel.setText("Score: " + score); // Score-Anzeige aktualisieren
             }
         });
@@ -45,7 +46,7 @@ public class ScoreCounter extends JFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    updateScoreBasedOnFuelLevel();
+                    scoreaktuallisisiert();
                     scoreLabel.setText("Score: " + score); // Score-Anzeige aktualisieren
                 }
             }
@@ -56,19 +57,22 @@ public class ScoreCounter extends JFrame {
         requestFocusInWindow();
     }
 
-    private void updateScoreBasedOnFuelLevel() {
-        int fuelLevel = treibstoffleiste.getFuelLevel();
+    private void scoreaktuallisisiert() {
+        Color gespeicherteFarbe = treibstoff.getGespeicherteFarbe();
         // Berechne den Farbbereich, in dem sich der Zeiger befindet
-        if (fuelLevel > 80) {
-            score -= 100; // Intensives Grün
-        } else if (fuelLevel > 60) {
-            score -= 50; // Schwaches Grün
-        } else if (fuelLevel > 40) {
-            score -= 30; // Gelb
-        } else if (fuelLevel > 20) {
+        if (gespeicherteFarbe == Color.GREEN.darker()) {
+            score -= 50; // Intensives Grün
+        } else if (gespeicherteFarbe == Color.GREEN) {
+            score -= 25; // Schwaches Grün
+        } else if (gespeicherteFarbe == Color.YELLOW) {
+            score -= 15; // Gelb
+        } else if (gespeicherteFarbe == Color.ORANGE) {
             score -= 20; // Orange
-        } else {
+        } else if(gespeicherteFarbe == Color.RED){
             score -= 10; // Rot
+        }
+         else if (gespeicherteFarbe == Color.BLACK){
+             score -=100;
         }
     }
 
