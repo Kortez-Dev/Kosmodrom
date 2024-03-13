@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 
 public class SpielMenu extends JFrame implements ActionListener {
     private JButton singlePlayerButton;
@@ -62,9 +63,20 @@ public class SpielMenu extends JFrame implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == singlePlayerButton) {
-            JOptionPane.showMessageDialog(this, "Einzelspieler gestartet!");
-            // Hier Code für den Einzelspieler-Modus einfügen
-            startSinglePlayerGame(); // Starte das Einzelspieler-Spiel
+            try {
+                // Kompiliere und führe die Hintergrundklasse aus
+                ProcessBuilder compiler = new ProcessBuilder("javac", "Hintergrund.java");
+                compiler.inheritIO();
+                Process compileProcess = compiler.start();
+                compileProcess.waitFor();
+
+                ProcessBuilder runner = new ProcessBuilder("java", "Hintergrund");
+                runner.inheritIO();
+                runner.start();
+            } catch (IOException | InterruptedException ex) {
+                ex.printStackTrace();
+            }
+            dispose(); // Hauptmenü schließen
         } else if (e.getSource() == multiPlayerButton) {
             JOptionPane.showMessageDialog(this, "Mehrspieler gestartet!");
             // Hier Code für den Mehrspieler-Modus einfügen
@@ -72,17 +84,6 @@ public class SpielMenu extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "Spiel beenden!");
             System.exit(0);
         }
-    }
-
-    private void startSinglePlayerGame() {
-        // Öffne das Einzelspieler-Spiel
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Textured Panel");
-            frame.setSize(400, 400);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.add(new TexturedPanel());
-            frame.setVisible(true);
-        });
     }
 
     public static void main(String[] args) {
