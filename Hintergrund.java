@@ -1,65 +1,70 @@
-
 import javax.swing.*;
-        import java.awt.*;
-        import java.awt.event.ActionEvent;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 
 public class Hintergrund extends JPanel implements ActionListener {
-    private Image backgroundImage;
+
+    private BufferedImage hintergrundBild;
     private Timer timer;
-    private int yPos = 0; // Startposition des Bildes
+    private int yVersatz = 0;
 
     public Hintergrund() {
-        // Hintergrundbild laden
-        backgroundImage = new ImageIcon("C:\\Schule\\ber.jpg").getImage();
+        // Lade das Bild. Ändere den Pfad zum Bild entsprechend.
+        hintergrundBild = ladeBild("C:\\Schule\\ber.jpg");
 
-        // Timer mit Verzögerung (hier: 100ms) initialisieren und starten
+        // Setze einen Timer, der das actionPerformed Event alle 100 ms auslöst
         timer = new Timer(100, this);
         timer.start();
+    }
+
+    private BufferedImage ladeBild(String pfad) {
+        ImageIcon icon = new ImageIcon(pfad);
+        Image tmpBild = icon.getImage();
+        BufferedImage bImage = new BufferedImage(tmpBild.getWidth(null), tmpBild.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D bGr = bImage.createGraphics();
+        bGr.drawImage(tmpBild, 0, 0, null);
+        bGr.dispose();
+
+        return bImage;
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Aktuelle Größe des Panels ermitteln
-        int width = getWidth();
-        int height = getHeight();
+        // Berechne neue Breite und Höhe, um das Bild an die Fenstergröße anzupassen
+        int neueBreite = this.getWidth();
+        int neueHoehe = (int)(((double)neueBreite / hintergrundBild.getWidth()) * hintergrundBild.getHeight());
 
-        // Berechnen, wie oft das Bild vertikal wiederholt werden muss
-        int imageWidth = backgroundImage.getWidth(this);
-        int imageHeight = backgroundImage.getHeight(this);
-
-        // Hintergrundbilder zeichnen
-        for (int x = 0; x < width; x += imageWidth) {
-            for (int y = yPos - imageHeight; y < height; y += imageHeight) {
-                g.drawImage(backgroundImage, x, y, this);
-            }
+        // Zeichne das Bild mehrmals, um den Hintergrund nahtlos zu füllen
+        for (int y = -neueHoehe + yVersatz; y < getHeight(); y += neueHoehe) {
+            g.drawImage(hintergrundBild, 0, y, neueBreite, neueHoehe, this);
         }
-
-        // Animation für flüssiges Scrolling
-        Toolkit.getDefaultToolkit().sync();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // yPos aktualisieren, um das Bild nach unten zu bewegen
-        yPos += 2;
+        // Bewege das Bild nach unten
+        yVersatz += 1;
 
-        // yPos zurücksetzen, wenn das Ende erreicht ist
-        if (yPos > backgroundImage.getHeight(this)) {
-            yPos = 0;
+        // Setze den Versatz zurück, wenn das Ende des Bildes erreicht ist, um ein nahtloses Scrollen zu ermöglichen
+        if (yVersatz >= hintergrundBild.getHeight()) {
+            yVersatz = 0;
         }
 
-        // Panel neu zeichnen, um die Animation zu aktualisieren
+        // Fordere eine Neumalung des Panels an, um das aktualisierte Bild anzuzeigen
         repaint();
     }
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JFrame frame = new JFrame("Hintergrund Beispiel");
+        Hintergrund hintergrund = new Hintergrund();
+        frame.setContentPane(hintergrund);
         frame.setSize(800, 600);
-        frame.add(new Hintergrund());
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
 }
