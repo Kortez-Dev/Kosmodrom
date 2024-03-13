@@ -9,6 +9,7 @@ public class Treibstoff extends JPanel implements KeyListener {
     private int zeigerPosition = 0; // Start an der Spitze
     private boolean istPausiert = false;
     private Color gespeicherteFarbe;
+    private boolean amUnterstenPunkt = false; // Speichert, ob der Zeiger am untersten Punkt ist
 
     public Treibstoff() {
         setPreferredSize(new Dimension(140, 320)); // Etwas größer, um Platz für die Umrandung zu schaffen
@@ -17,13 +18,36 @@ public class Treibstoff extends JPanel implements KeyListener {
         Timer timer = new Timer(100, e -> {
             if (!istPausiert) {
                 zeigerPosition += 2; // Geschwindigkeit anpassen
-                if (zeigerPosition > hoeheLeiste) {
-                    zeigerPosition = 0; // Zurück an den Anfang
+                if (zeigerPosition >= hoeheLeiste) {
+                    zeigerPosition = hoeheLeiste; // Sorgt dafür, dass der Zeiger am untersten Punkt pausiert
+                    if (!amUnterstenPunkt) {
+                        amUnterstenPunkt = true;
+                        pauseForThreeSeconds(); // Pausiert den Zeiger für 3 Sekunden
+                    }
+                } else {
+                    amUnterstenPunkt = false; // Der Zeiger ist nicht am untersten Punkt
+                    gespeicherteFarbe = Color.BLACK;
                 }
             }
             repaint();
         });
         timer.start();
+    }
+    public void setGespeicherteFarbe( Color gespeicherteFarbe) {
+        this.gespeicherteFarbe = gespeicherteFarbe;
+    }
+    public Color getGespeicherteFarbe() {
+        return gespeicherteFarbe;
+    }
+
+    private void pauseForThreeSeconds() {
+        istPausiert = true;
+        new Timer(3000, ev -> {
+            istPausiert = false;
+            zeigerPosition = 0; // Zeigerposition zurücksetzen
+            amUnterstenPunkt = false; // Am untersten Punkt zurücksetzen, da der Zeiger oben beginnt
+            ((Timer)ev.getSource()).stop(); // Den Timer stoppen
+        }).start();
     }
 
     @Override
@@ -54,15 +78,11 @@ public class Treibstoff extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+        if (e.getKeyCode() == KeyEvent.VK_E) {
             if (!istPausiert) {
                 istPausiert = true;
                 gespeicherteFarbe = farben[zeigerPosition / (hoeheLeiste / farben.length)];
-                new Timer(3000, ev -> {
-                    istPausiert = false;
-                    zeigerPosition = 0; // Zeigerposition zurücksetzen
-                    ((Timer)ev.getSource()).stop(); // Den Timer stoppen
-                }).start();
+                pauseForThreeSeconds(); // Pausiert den Zeiger für 3 Sekunden
             }
         }
     }
@@ -76,10 +96,10 @@ public class Treibstoff extends JPanel implements KeyListener {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             Treibstoff treibstoff = new Treibstoff();
             frame.add(treibstoff);
-            frame.pack(); // Passt die Frame-Größe an
-            frame.setLocationRelativeTo(null); // Zentriert das Fenster auf dem Bildschirm
+            frame.pack();
+            frame.setLocationRelativeTo(null);
             frame.setVisible(true);
-            treibstoff.requestFocusInWindow(); // Um Tasteneingaben zu empfangen
+            treibstoff.requestFocusInWindow();
         });
     }
 }
