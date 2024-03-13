@@ -6,9 +6,11 @@ public class Treibstoff extends JPanel implements KeyListener {
     private final int breiteLeiste = 20; // Breite der Treibstoffleiste
     private final int hoeheLeiste = 300; // Höhe der Treibstoffleiste
     private final Color[] farben = {Color.GREEN.darker(), Color.GREEN, Color.YELLOW, Color.ORANGE, Color.RED};
+    // Mapping von Color zu String
+    private final String[] farbnamen = {"Dunkelgrün", "Grün", "Gelb", "Orange", "Rot"};
     private int zeigerPosition = 0; // Start an der Spitze
     private boolean istPausiert = false;
-    private Color gespeicherteFarbe;
+    private String gespeicherteFarbe; // Typ zu String geändert
     private boolean amUnterstenPunkt = false; // Speichert, ob der Zeiger am untersten Punkt ist
 
     public Treibstoff() {
@@ -22,23 +24,40 @@ public class Treibstoff extends JPanel implements KeyListener {
                     zeigerPosition = hoeheLeiste; // Sorgt dafür, dass der Zeiger am untersten Punkt pausiert
                     if (!amUnterstenPunkt) {
                         amUnterstenPunkt = true;
+                        gespeicherteFarbe = "Schwarz";
                         pauseForThreeSeconds(); // Pausiert den Zeiger für 3 Sekunden
                     }
                 } else {
                     amUnterstenPunkt = false; // Der Zeiger ist nicht am untersten Punkt
-                    gespeicherteFarbe = Color.BLACK;
+
                 }
             }
             repaint();
         });
         timer.start();
     }
-    public void setGespeicherteFarbe( Color gespeicherteFarbe) {
-        this.gespeicherteFarbe = gespeicherteFarbe;
-    }
-    public Color getGespeicherteFarbe() {
+    public void setGespeicherteFarbe(Color farbe) {
+        // Diese Methode muss möglicherweise angepasst oder entfernt werden, je nachdem, wie Sie die Farbe festlegen möchten
+        int index = java.util.Arrays.asList(farben).indexOf(farbe);
+        if(gespeicherteFarbe=="Schwarz") {
+           this.gespeicherteFarbe = "Schwarz";
+        }
+        else {
+             if (index != -1) {
+                this.gespeicherteFarbe = farbnamen[index];
+            }
+        }
+        }
+
+    public String getGespeicherteFarbe() {
         return gespeicherteFarbe;
     }
+
+    public boolean isAmUnterstenPunkt() {
+        return this.amUnterstenPunkt;
+    }
+
+
 
     private void pauseForThreeSeconds() {
         istPausiert = true;
@@ -49,7 +68,10 @@ public class Treibstoff extends JPanel implements KeyListener {
             ((Timer)ev.getSource()).stop(); // Den Timer stoppen
         }).start();
     }
-
+    public boolean isAmOberstenPunkt() {
+        // Gibt true zurück, wenn der Zeiger sich auf der höchsten Stelle befindet
+        return zeigerPosition == 0;
+    }
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -81,7 +103,8 @@ public class Treibstoff extends JPanel implements KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_E) {
             if (!istPausiert) {
                 istPausiert = true;
-                gespeicherteFarbe = farben[zeigerPosition / (hoeheLeiste / farben.length)];
+                int farbIndex = zeigerPosition / (hoeheLeiste / farben.length);
+                gespeicherteFarbe = farbnamen[farbIndex]; // Farbe als String speichern
                 pauseForThreeSeconds(); // Pausiert den Zeiger für 3 Sekunden
             }
         }
