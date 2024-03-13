@@ -65,12 +65,12 @@ public class SpielMenu extends JFrame implements ActionListener {
         if (e.getSource() == singlePlayerButton) {
             try {
                 // Kompiliere und führe die Hintergrundklasse aus
-                ProcessBuilder compiler = new ProcessBuilder("javac", "Hintergrund.java");
+                ProcessBuilder compiler = new ProcessBuilder("javac", "Hauptspiel.java");
                 compiler.inheritIO();
                 Process compileProcess = compiler.start();
                 compileProcess.waitFor();
 
-                ProcessBuilder runner = new ProcessBuilder("java", "Hintergrund");
+                ProcessBuilder runner = new ProcessBuilder("java", "Hauptspiel");
                 runner.inheritIO();
                 runner.start();
             } catch (IOException | InterruptedException ex) {
