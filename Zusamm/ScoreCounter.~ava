@@ -1,0 +1,64 @@
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.FlowLayout;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.Color;
+
+public class ScoreCounter extends JPanel {
+    private int score = 0; // Startwert des Scores
+    private JLabel scoreLabel;
+
+
+    public ScoreCounter() {
+        setLayout(new FlowLayout() );
+
+        // Timer, der jede Sekunde ein Event auslöst
+        Timer timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                score += 20; // Score um 20 erhöhen
+                scoreLabel.setText("Score: " + score); // Score-Anzeige aktualisieren
+            }
+        });
+
+        // Label für die Score-Anzeige
+        scoreLabel = new JLabel("Score: " + score);
+        add(scoreLabel);
+
+        timer.start(); // Timer starten
+
+    }
+
+    public void scoreaktualisieren(String farbe) {
+        String gespeicherteFarbe = farbe;
+        int abzug= 0;
+        System.out.println("Klappt");
+
+        // Berechne den Farbbereich, in dem sich der Zeiger befindet
+        if (gespeicherteFarbe.equals("Dunkelgrün")) {
+            score -= 50; // Intensives Grün
+        } else if (gespeicherteFarbe.equals("Grün")) {
+            score -= 25; // Schwaches Grün
+        } else if (gespeicherteFarbe.equals("Gelb")) {
+            score -= 15; // Gelb
+        } else if (gespeicherteFarbe.equals("Orange")) {
+            score -= 20; // Orange
+        } else if(gespeicherteFarbe.equals("Rot")){
+            score -= 10; // Rot
+        }
+        else if (gespeicherteFarbe.equals("Schwarz")){
+            score -= 100; // Schwarz
+        }
+
+    }
+    public void setScore(int score) {
+        this.score = score;
+    }
+    public int getScore() {
+        return score;
+    }
+
+
+}
